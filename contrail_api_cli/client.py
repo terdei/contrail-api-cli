@@ -35,7 +35,7 @@ class SessionLoader(loading.session.Session):
     def plugin_class(self):
         return ContrailAPISession
 
-    def make(self, host="localhost", port=8082, protocol="http", os_auth_type="http", **kwargs):
+    def make(self, host="localhost", port=8082, protocol="http", baseuri="", os_auth_type="http", **kwargs):
         """Initialize a session to Contrail API server
 
         :param os_auth_type: auth plugin to use:
@@ -53,6 +53,7 @@ class SessionLoader(loading.session.Session):
                                                  host=host,
                                                  port=port,
                                                  protocol=protocol,
+                                                 baseuri=baseuri,
                                                  auth=plugin)
 
     def register_argparse_arguments(self, parser):
@@ -72,6 +73,10 @@ class SessionLoader(loading.session.Session):
                                     type=str,
                                     default=os.environ.get('CONTRAIL_API_PROTOCOL', 'http'),
                                     help="protocol used (default=%(default)s)")
+        contrail_group.add_argument('--baseuri',
+                                    type=str,
+                                    default=os.environ.get('CONTRAIL_API_BASEURI', ''),
+                                    help="protocol used (default=%(default)s)")
         super(SessionLoader, self).register_argparse_arguments(parser)
 
 
@@ -88,15 +93,17 @@ class ContrailAPISession(Session):
     protocol = None
     host = None
     port = None
+    baseuri = None
     default_headers = {
         'X-Contrail-Useragent': '%s:%s' % (platform.node(), 'contrail-api-cli'),
         "Content-Type": "application/json"
     }
 
-    def __init__(self, host="localhost", port=8082, protocol="http", **kwargs):
+    def __init__(self, host="localhost", port=8082, protocol="http", baseuri='', **kwargs):
         self.host = host
         self.port = port
         self.protocol = protocol
+        self.baseuri = baseuri
         session = requests.Session()
         adapter = requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100)
         session.mount('http://', adapter)
@@ -112,7 +119,7 @@ class ContrailAPISession(Session):
 
     @property
     def base_url(self):
-        return "%s://%s:%s" % (self.protocol, self.host, self.port)
+        return "%s://%s:%s%s" % (self.protocol, self.host, self.port, self.baseuri)
 
     def make_url(self, uri):
         return self.base_url + uri
