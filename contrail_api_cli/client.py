@@ -3,13 +3,12 @@ import os
 import platform
 from argparse import Namespace
 from functools import wraps
+from .utils import FQName, to_json
 import requests
 
 from keystoneauth1 import loading
 from keystoneauth1.session import Session
 from keystoneauth1.exceptions.http import HttpError
-
-from .utils import FQName, to_json
 
 
 def contrail_error_handler(f):
