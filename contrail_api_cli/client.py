@@ -76,7 +76,7 @@ class SessionLoader(loading.session.Session):
         contrail_group.add_argument('--baseuri',
                                     type=str,
                                     default=os.environ.get('CONTRAIL_API_BASEURI', ''),
-                                    help="protocol used (default=%(default)s)")
+                                    help="base URI component added after hostname:port (default=%(default)s)")
         super(SessionLoader, self).register_argparse_arguments(parser)
 
 
