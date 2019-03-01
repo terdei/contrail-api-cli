@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import shlex
-import sys
 import fileinput
 from six import text_type
 
 from keystoneauth1.exceptions.http import HttpError, HTTPClientError
 
-from ..command import Command, Arg, Option
+from ..command import Command, Arg
 from ..manager import CommandManager
-from ..context import Context
 from ..schema import SchemaError
 from ..exceptions import CommandError, CommandNotFound, NotFound, Exists
 from ..utils import printo
@@ -36,7 +34,7 @@ class Batch(Command):
                 if result:
                     printo(result)
         except IOError:
-            printo("Cannot read from file: {}".format(filename))
+            printo("Cannot read from file: {}".format(fileinput.filename()))
         except (HttpError, HTTPClientError, CommandError, CommandNotFound,
                 SchemaError, NotFound, Exists) as e:
             printo(text_type(e))
